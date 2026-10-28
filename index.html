@@ -1,0 +1,2506 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AeroForge — Ingeniería Electrónica y Sistemas Autónomos</title>
+  <meta name="description" content="Iniciativa independiente de investigación y desarrollo tecnológico enfocada en hardware, sistemas embebidos, comunicaciones digitales y plataformas autónomas.">
+  <meta name="author" content="AeroForge">
+  
+  <!-- Open Graph & Meta Social -->
+  <meta property="og:type" content="website">
+  <meta property="og:title" content="AeroForge — Ingeniería Electrónica y Sistemas Autónomos">
+  <meta property="og:description" content="Iniciativa independiente de I+D tecnológico en hardware, microcontroladores STM32, radiofrecuencia y plataformas autónomas.">
+  <meta property="og:locale" content="es_ES">
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:title" content="AeroForge — Ingeniería Electrónica y Sistemas Autónomos">
+  <meta name="twitter:description" content="Iniciativa independiente de investigación y desarrollo tecnológico enfocada en hardware, sistemas embebidos y plataformas autónomas.">
+
+  <!-- Favicon SVG en línea -->
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230a0d14'/%3E%3Cpath d='M16 5 L26 23 L21 23 L16 14 L11 23 L6 23 Z' fill='%2310b981'/%3E%3Ccircle cx='16' cy='18' r='2' fill='%2306b6d4'/%3E%3C/svg%3E">
+
+  <!-- Fuentes: Inter & JetBrains Mono -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <style>
+    /* ==========================================================================
+       VARIABLES Y SISTEMA DE DISEÑO (Hardware R&D Lab Theme)
+       ========================================================================== */
+    :root {
+      --bg-base: #080b11;
+      --bg-surface: #0e131d;
+      --bg-surface-elevated: #141c2b;
+      --bg-card: rgba(14, 19, 29, 0.82);
+      --bg-card-hover: rgba(20, 28, 43, 0.92);
+
+      --border-subtle: rgba(255, 255, 255, 0.07);
+      --border-medium: rgba(255, 255, 255, 0.14);
+      --border-accent: rgba(16, 185, 129, 0.35);
+      --border-accent-strong: rgba(16, 185, 129, 0.7);
+
+      --pcb-green: #10b981;
+      --pcb-green-light: #34d399;
+      --pcb-green-dim: #059669;
+      --pcb-green-bg: rgba(16, 185, 129, 0.08);
+      --pcb-green-bg-hover: rgba(16, 185, 129, 0.15);
+
+      --cyan-accent: #06b6d4;
+      --cyan-dim: #0891b2;
+      --cyan-bg: rgba(6, 182, 212, 0.08);
+
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --text-dim: #64748b;
+
+      --font-sans: 'Inter', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+
+      --radius-sm: 6px;
+      --radius-md: 10px;
+      --radius-lg: 16px;
+      --radius-xl: 22px;
+
+      --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.35);
+      --shadow-md: 0 10px 30px rgba(0, 0, 0, 0.5);
+      --shadow-accent: 0 0 25px rgba(16, 185, 129, 0.18);
+
+      --transition-fast: 0.18s ease;
+      --transition-normal: 0.28s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    /* ==========================================================================
+       REINICIO Y ACCESIBILIDAD BASE
+       ========================================================================== */
+    *, *::before, *::after {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    html {
+      scroll-behavior: smooth;
+      font-size: 16px;
+      color-scheme: dark;
+    }
+
+    body {
+      background-color: var(--bg-base);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      line-height: 1.65;
+      overflow-x: hidden;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+
+      /* Malla milimétrica y retícula de circuito impreso */
+      background-image: 
+        radial-gradient(circle at 50% 0%, rgba(16, 185, 129, 0.09) 0%, transparent 60%),
+        radial-gradient(circle at 85% 30%, rgba(6, 182, 212, 0.05) 0%, transparent 45%),
+        linear-gradient(rgba(255, 255, 255, 0.02) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.02) 1px, transparent 1px);
+      background-size: 100% 100%, 100% 100%, 48px 48px, 48px 48px;
+      background-position: 0 0, 0 0, -1px -1px, -1px -1px;
+    }
+
+    /* Accesibilidad: Enlace directo al contenido principal */
+    .skip-link {
+      position: absolute;
+      top: -60px;
+      left: 1.5rem;
+      background: var(--pcb-green);
+      color: #03140e;
+      padding: 0.6rem 1.2rem;
+      font-weight: 600;
+      font-size: 0.875rem;
+      border-radius: var(--radius-sm);
+      z-index: 999;
+      transition: top var(--transition-fast);
+      text-decoration: none;
+    }
+
+    .skip-link:focus {
+      top: 1rem;
+    }
+
+    :focus-visible {
+      outline: 2px solid var(--pcb-green);
+      outline-offset: 3px;
+    }
+
+    /* Contenedores globales */
+    .container {
+      width: 100%;
+      max-width: 1140px;
+      margin: 0 auto;
+      padding: 0 1.5rem;
+    }
+
+    section {
+      padding: 6rem 0;
+      position: relative;
+    }
+
+    @media (max-width: 768px) {
+      section {
+        padding: 4rem 0;
+      }
+    }
+
+    /* Títulos y etiquetas de sección */
+    .section-header {
+      margin-bottom: 3rem;
+      max-width: 780px;
+    }
+
+    .section-eyebrow {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      color: var(--pcb-green);
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 0.6rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-eyebrow::before {
+      content: '';
+      display: inline-block;
+      width: 14px;
+      height: 2px;
+      background: var(--pcb-green);
+    }
+
+    .section-title {
+      font-size: clamp(1.85rem, 3.8vw, 2.5rem);
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.25;
+      letter-spacing: -0.025em;
+      margin-bottom: 0.9rem;
+    }
+
+    .section-description {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    /* Divisores técnicos */
+    .technical-divider {
+      width: 100%;
+      height: 1px;
+      background: linear-gradient(90deg, transparent, var(--border-subtle) 20%, var(--border-subtle) 80%, transparent);
+      margin: 0;
+    }
+
+    /* ==========================================================================
+       A. NAVBAR (Barra de Navegación Responsiva)
+       ========================================================================== */
+    .header {
+      position: sticky;
+      top: 0;
+      z-index: 200;
+      background: rgba(8, 11, 17, 0.88);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border-bottom: 1px solid var(--border-subtle);
+      transition: background-color var(--transition-fast);
+    }
+
+    .nav-container {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      height: 4.5rem;
+    }
+
+    /* Identidad AeroForge con icono de hardware integrado */
+    .brand-logo {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.75rem;
+      text-decoration: none;
+      color: #ffffff;
+      font-family: var(--font-sans);
+      font-weight: 700;
+      font-size: 1.15rem;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-mark {
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid var(--border-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pcb-green);
+      transition: all var(--transition-fast);
+    }
+
+    .brand-logo:hover .brand-mark {
+      background: rgba(16, 185, 129, 0.22);
+      border-color: var(--pcb-green);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.35);
+    }
+
+    .brand-text {
+      display: flex;
+      align-items: baseline;
+      gap: 0.3rem;
+    }
+
+    .brand-suffix {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--cyan-accent);
+      background: var(--cyan-bg);
+      padding: 0.15rem 0.4rem;
+      border-radius: 4px;
+      border: 1px solid rgba(6, 182, 212, 0.25);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+    }
+
+    /* Enlaces de escritorio */
+    .nav-menu {
+      display: flex;
+      align-items: center;
+      gap: 1.75rem;
+      list-style: none;
+    }
+
+    .nav-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.9rem;
+      font-weight: 500;
+      transition: color var(--transition-fast);
+      position: relative;
+      padding: 0.4rem 0;
+    }
+
+    .nav-link:hover,
+    .nav-link.active {
+      color: #ffffff;
+    }
+
+    .nav-link.active::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: var(--pcb-green);
+      border-radius: 2px;
+    }
+
+    .nav-cta {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      padding: 0.45rem 0.95rem;
+      border-radius: var(--radius-sm);
+      background: var(--pcb-green-bg);
+      border: 1px solid var(--border-accent);
+      color: var(--pcb-green);
+      text-decoration: none;
+      transition: all var(--transition-fast);
+      font-weight: 500;
+    }
+
+    .nav-cta:hover {
+      background: var(--pcb-green);
+      color: #03140e;
+      border-color: var(--pcb-green);
+      box-shadow: 0 0 14px rgba(16, 185, 129, 0.3);
+    }
+
+    /* Botón Menú Móvil (Hamburger) */
+    .nav-toggle {
+      display: none;
+      background: transparent;
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-sm);
+      width: 42px;
+      height: 42px;
+      color: var(--text-main);
+      cursor: pointer;
+      align-items: center;
+      justify-content: center;
+      transition: all var(--transition-fast);
+    }
+
+    .nav-toggle:hover {
+      border-color: var(--border-accent);
+      color: var(--pcb-green);
+    }
+
+    @media (max-width: 900px) {
+      .nav-toggle {
+        display: flex;
+      }
+
+      .nav-menu {
+        position: fixed;
+        top: 4.5rem;
+        left: 0;
+        width: 100%;
+        background: rgba(8, 11, 17, 0.98);
+        backdrop-filter: blur(20px);
+        -webkit-backdrop-filter: blur(20px);
+        border-bottom: 1px solid var(--border-subtle);
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1.5rem 1.75rem 2rem;
+        gap: 1.25rem;
+        transform: translateY(-110%);
+        opacity: 0;
+        visibility: hidden;
+        transition: transform var(--transition-normal), opacity var(--transition-normal), visibility var(--transition-normal);
+        box-shadow: 0 15px 35px rgba(0, 0, 0, 0.6);
+      }
+
+      .nav-menu.open {
+        transform: translateY(0);
+        opacity: 1;
+        visibility: visible;
+      }
+
+      .nav-menu li {
+        width: 100%;
+      }
+
+      .nav-link {
+        font-size: 1.05rem;
+        display: block;
+        padding: 0.6rem 0;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.04);
+      }
+
+      .nav-cta {
+        display: flex;
+        justify-content: center;
+        width: 100%;
+        padding: 0.75rem;
+        margin-top: 0.5rem;
+        font-size: 0.9rem;
+      }
+    }
+
+    /* ==========================================================================
+       B. HERO PRINCIPAL
+       ========================================================================== */
+    .hero-section {
+      min-height: calc(100vh - 4.5rem);
+      display: flex;
+      align-items: center;
+      padding: 5rem 0 4rem;
+      position: relative;
+    }
+
+    .hero-grid {
+      display: grid;
+      grid-template-columns: 1.15fr 0.85fr;
+      align-items: center;
+      gap: 3.5rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-grid {
+        grid-template-columns: 1fr;
+        gap: 3rem;
+        text-align: center;
+      }
+    }
+
+    .hero-badge-container {
+      margin-bottom: 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    @media (max-width: 960px) {
+      .hero-badge-container {
+        justify-content: center;
+      }
+    }
+
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      padding: 0.35rem 0.85rem;
+      border-radius: 9999px;
+      background: var(--pcb-green-bg);
+      border: 1px solid var(--border-accent);
+      color: var(--pcb-green);
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.06em;
+    }
+
+    .pulse-dot {
+      width: 7px;
+      height: 7px;
+      border-radius: 50%;
+      background-color: var(--pcb-green);
+      box-shadow: 0 0 8px var(--pcb-green);
+      animation: pulseAnimation 2s infinite ease-in-out;
+    }
+
+    @keyframes pulseAnimation {
+      0% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0.7);
+      }
+      70% {
+        transform: scale(1.1);
+        box-shadow: 0 0 0 7px rgba(16, 185, 129, 0);
+      }
+      100% {
+        transform: scale(0.9);
+        box-shadow: 0 0 0 0 rgba(16, 185, 129, 0);
+      }
+    }
+
+    .hero-title {
+      font-size: clamp(2.35rem, 4.6vw, 3.65rem);
+      font-weight: 700;
+      line-height: 1.14;
+      letter-spacing: -0.03em;
+      color: #ffffff;
+      margin-bottom: 1.4rem;
+    }
+
+    .hero-title-accent {
+      background: linear-gradient(135deg, #ffffff 40%, var(--pcb-green-light) 90%);
+      -webkit-background-clip: text;
+      background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .hero-subtitle {
+      font-size: clamp(1.05rem, 2vw, 1.22rem);
+      color: var(--text-muted);
+      line-height: 1.68;
+      margin-bottom: 2.25rem;
+      max-width: 620px;
+    }
+
+    @media (max-width: 960px) {
+      .hero-subtitle {
+        margin-left: auto;
+        margin-right: auto;
+      }
+    }
+
+    .hero-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    @media (max-width: 960px) {
+      .hero-actions {
+        justify-content: center;
+      }
+    }
+
+    /* Botones de acción */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.6rem;
+      padding: 0.85rem 1.75rem;
+      border-radius: var(--radius-sm);
+      font-size: 0.95rem;
+      font-weight: 600;
+      text-decoration: none;
+      transition: all var(--transition-normal);
+      cursor: pointer;
+      border: 1px solid transparent;
+    }
+
+    .btn-primary {
+      background-color: var(--pcb-green);
+      color: #03140e;
+      border-color: var(--pcb-green);
+      box-shadow: 0 4px 18px rgba(16, 185, 129, 0.28);
+    }
+
+    .btn-primary:hover {
+      background-color: var(--pcb-green-light);
+      border-color: var(--pcb-green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(16, 185, 129, 0.42);
+    }
+
+    .btn-secondary {
+      background-color: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      border-color: var(--border-medium);
+    }
+
+    .btn-secondary:hover {
+      background-color: rgba(255, 255, 255, 0.08);
+      border-color: var(--pcb-green);
+      color: #ffffff;
+      transform: translateY(-2px);
+    }
+
+    /* Panel visual del Hero (Ilustración técnica SVG interactiva) */
+    .hero-visual {
+      position: relative;
+      display: flex;
+      justify-content: center;
+    }
+
+    .hero-schematic-card {
+      width: 100%;
+      max-width: 440px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-lg);
+      padding: 1.5rem;
+      box-shadow: var(--shadow-md), var(--shadow-accent);
+      position: relative;
+      overflow: hidden;
+      backdrop-filter: blur(12px);
+    }
+
+    .hero-schematic-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--pcb-green), var(--cyan-accent));
+    }
+
+    .schematic-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 1rem;
+      margin-bottom: 1.25rem;
+      border-bottom: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+    }
+
+    .schematic-tag {
+      color: var(--pcb-green);
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .schematic-canvas {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    .schematic-status-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.75rem;
+      margin-top: 1.25rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+    }
+
+    .status-item {
+      text-align: center;
+      padding: 0.4rem 0.2rem;
+      background: rgba(255, 255, 255, 0.02);
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(255, 255, 255, 0.04);
+    }
+
+    .status-item-label {
+      color: var(--text-dim);
+      margin-bottom: 0.2rem;
+    }
+
+    .status-item-val {
+      color: var(--text-main);
+      font-weight: 600;
+    }
+
+    .status-item-val.highlight {
+      color: var(--pcb-green);
+    }
+
+    /* ==========================================================================
+       C. SOBRE AERFORGE
+       ========================================================================== */
+    .about-initiative-section {
+      background: rgba(14, 19, 29, 0.4);
+    }
+
+    .about-initiative-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .about-initiative-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+    }
+
+    .initiative-text {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .initiative-text strong {
+      color: #ffffff;
+      font-weight: 600;
+    }
+
+    .initiative-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 2.25rem;
+      position: relative;
+      box-shadow: var(--shadow-sm);
+    }
+
+    .initiative-box::before {
+      content: '';
+      position: absolute;
+      left: 0;
+      top: 2rem;
+      bottom: 2rem;
+      width: 3px;
+      background: linear-gradient(180deg, var(--pcb-green), var(--cyan-accent));
+      border-radius: 0 2px 2px 0;
+    }
+
+    .initiative-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .initiative-list-item {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .initiative-icon {
+      width: 28px;
+      height: 28px;
+      border-radius: var(--radius-sm);
+      background: var(--pcb-green-bg);
+      border: 1px solid var(--border-accent);
+      color: var(--pcb-green);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.15rem;
+    }
+
+    .initiative-item-title {
+      font-weight: 600;
+      font-size: 0.98rem;
+      color: #ffffff;
+      margin-bottom: 0.2rem;
+    }
+
+    .initiative-item-desc {
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      line-height: 1.55;
+    }
+
+    /* ==========================================================================
+       D. ÁREAS DE DESARROLLO
+       ========================================================================== */
+    .areas-grid {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 768px) {
+      .areas-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .area-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 2rem;
+      transition: all var(--transition-normal);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      overflow: hidden;
+    }
+
+    .area-card::after {
+      content: '';
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: var(--pcb-green);
+      transform: scaleX(0);
+      transform-origin: left;
+      transition: transform var(--transition-normal);
+    }
+
+    .area-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--border-accent);
+      background: var(--bg-card-hover);
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.4), 0 0 18px rgba(16, 185, 129, 0.12);
+    }
+
+    .area-card:hover::after {
+      transform: scaleX(1);
+    }
+
+    .area-icon-container {
+      width: 48px;
+      height: 48px;
+      border-radius: var(--radius-sm);
+      background: var(--pcb-green-bg);
+      border: 1px solid var(--border-accent);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: var(--pcb-green);
+      margin-bottom: 1.35rem;
+      transition: all var(--transition-fast);
+    }
+
+    .area-card:hover .area-icon-container {
+      background: var(--pcb-green);
+      color: #03140e;
+      box-shadow: 0 0 16px rgba(16, 185, 129, 0.4);
+    }
+
+    .area-title {
+      font-size: 1.25rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.65rem;
+      letter-spacing: -0.015em;
+    }
+
+    .area-description {
+      font-size: 0.95rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* ==========================================================================
+       E. PROYECTOS PRINCIPALES
+       ========================================================================== */
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(330px, 1fr));
+      gap: 2rem;
+    }
+
+    @media (max-width: 640px) {
+      .projects-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .project-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      transition: all var(--transition-normal);
+    }
+
+    .project-card:hover {
+      transform: translateY(-5px);
+      border-color: var(--border-accent);
+      box-shadow: var(--shadow-md), 0 0 20px rgba(16, 185, 129, 0.12);
+    }
+
+    /* Contenedor de imagen / placeholder profesional */
+    .project-media {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #090d15;
+      position: relative;
+      overflow: hidden;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .project-image {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.5s ease;
+      position: relative;
+      z-index: 2;
+    }
+
+    .project-card:hover .project-image {
+      transform: scale(1.03);
+    }
+
+    /* Blueprint / Schematic SVG Placeholder (Activo como vista previa técnica de alta fidelidad) */
+    .project-schematic-preview {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 1.25rem;
+      background: 
+        radial-gradient(circle at 50% 50%, rgba(16, 185, 129, 0.05), transparent 75%),
+        linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+        #0b101a;
+      background-size: 100% 100%, 24px 24px, 24px 24px;
+      z-index: 1;
+    }
+
+    .project-schematic-preview svg {
+      max-width: 100%;
+      max-height: 100%;
+      display: block;
+    }
+
+    .project-badge-overlay {
+      position: absolute;
+      top: 0.75rem;
+      right: 0.75rem;
+      z-index: 3;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--cyan-accent);
+      background: rgba(8, 11, 17, 0.85);
+      backdrop-filter: blur(8px);
+      padding: 0.2rem 0.55rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      letter-spacing: 0.04em;
+    }
+
+    .project-body {
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      flex-grow: 1;
+    }
+
+    .project-category {
+      font-family: var(--font-mono);
+      font-size: 0.76rem;
+      color: var(--pcb-green);
+      background: var(--pcb-green-bg);
+      border: 1px solid var(--border-accent);
+      padding: 0.2rem 0.6rem;
+      border-radius: var(--radius-sm);
+      display: inline-block;
+      align-self: flex-start;
+      margin-bottom: 0.85rem;
+      font-weight: 500;
+    }
+
+    .project-title {
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+      line-height: 1.35;
+    }
+
+    .project-description {
+      font-size: 0.92rem;
+      color: var(--text-muted);
+      line-height: 1.65;
+      margin-bottom: 1.5rem;
+      flex-grow: 1;
+    }
+
+    .project-tech-stack {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.45rem;
+      padding-top: 1rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .project-tech-pill {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.03);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      border: 1px solid rgba(255, 255, 255, 0.06);
+    }
+
+    /* ==========================================================================
+       F. TECNOLOGÍAS (Organizadas por Categorías)
+       ========================================================================== */
+    .technologies-section {
+      background: rgba(14, 19, 29, 0.45);
+    }
+
+    .tech-categories-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.75rem;
+    }
+
+    @media (max-width: 900px) {
+      .tech-categories-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+      }
+    }
+
+    .tech-category-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .tech-category-header {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+      margin-bottom: 1.25rem;
+      padding-bottom: 0.85rem;
+      border-bottom: 1px solid var(--border-subtle);
+    }
+
+    .tech-cat-icon {
+      color: var(--pcb-green);
+    }
+
+    .tech-category-title {
+      font-size: 1.05rem;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.01em;
+    }
+
+    .tech-pill-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.65rem;
+    }
+
+    .tech-badge {
+      font-family: var(--font-mono);
+      font-size: 0.82rem;
+      background: var(--bg-surface-elevated);
+      color: var(--text-main);
+      padding: 0.5rem 0.85rem;
+      border-radius: var(--radius-sm);
+      border: 1px solid var(--border-subtle);
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      transition: all var(--transition-fast);
+      cursor: default;
+    }
+
+    .tech-badge::before {
+      content: '';
+      width: 5px;
+      height: 5px;
+      border-radius: 50%;
+      background-color: var(--pcb-green);
+    }
+
+    .tech-badge:hover {
+      border-color: var(--pcb-green);
+      color: #ffffff;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(16, 185, 129, 0.15);
+    }
+
+    /* ==========================================================================
+       G. VISIÓN Y DESARROLLO FUTURO
+       ========================================================================== */
+    .vision-grid {
+      display: grid;
+      grid-template-columns: 0.95fr 1.05fr;
+      gap: 3.5rem;
+      align-items: center;
+    }
+
+    @media (max-width: 900px) {
+      .vision-grid {
+        grid-template-columns: 1fr;
+        gap: 2.5rem;
+      }
+    }
+
+    .vision-roadmap-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+      position: relative;
+    }
+
+    .vision-item {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-md);
+      padding: 1.5rem;
+      display: flex;
+      gap: 1.25rem;
+      align-items: flex-start;
+      transition: all var(--transition-normal);
+    }
+
+    .vision-item:hover {
+      border-color: var(--border-accent);
+      transform: translateX(4px);
+      background: var(--bg-card-hover);
+    }
+
+    .vision-step-number {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--pcb-green);
+      background: var(--pcb-green-bg);
+      border: 1px solid var(--border-accent);
+      width: 32px;
+      height: 32px;
+      border-radius: var(--radius-sm);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .vision-content h3 {
+      font-size: 1.05rem;
+      color: #ffffff;
+      margin-bottom: 0.3rem;
+      font-weight: 600;
+    }
+
+    .vision-content p {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+    }
+
+    /* ==========================================================================
+       H. FUNDADOR Y TRAYECTORIA
+       ========================================================================== */
+    .founder-section {
+      background: rgba(14, 19, 29, 0.3);
+    }
+
+    .founder-card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-subtle);
+      border-radius: var(--radius-lg);
+      padding: 3rem;
+      display: grid;
+      grid-template-columns: 0.8fr 1.2fr;
+      gap: 3rem;
+      position: relative;
+      overflow: hidden;
+    }
+
+    @media (max-width: 850px) {
+      .founder-card {
+        grid-template-columns: 1fr;
+        padding: 2rem 1.5rem;
+        gap: 2rem;
+      }
+    }
+
+    .founder-card::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 4px;
+      height: 100%;
+      background: var(--pcb-green);
+    }
+
+    .founder-intro {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .founder-badge {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+    }
+
+    .founder-title {
+      font-size: 1.65rem;
+      font-weight: 700;
+      color: #ffffff;
+      line-height: 1.2;
+    }
+
+    .founder-focus {
+      font-size: 0.95rem;
+      color: var(--pcb-green);
+      font-family: var(--font-mono);
+    }
+
+    .founder-narrative {
+      font-size: 1.02rem;
+      color: var(--text-muted);
+      line-height: 1.8;
+      display: flex;
+      flex-direction: column;
+      gap: 1.25rem;
+    }
+
+    .founder-timeline {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 1rem;
+      margin-top: 0.5rem;
+      padding-top: 1.25rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    @media (max-width: 600px) {
+      .founder-timeline {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .timeline-milestone {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      border-radius: var(--radius-sm);
+      padding: 0.85rem 1rem;
+    }
+
+    .milestone-year {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--pcb-green);
+      font-weight: 700;
+      margin-bottom: 0.2rem;
+    }
+
+    .milestone-text {
+      font-size: 0.84rem;
+      color: var(--text-main);
+      line-height: 1.45;
+    }
+
+    /* ==========================================================================
+       I. CONTACTO Y COLABORACIÓN
+       ========================================================================== */
+    .contact-card {
+      background: linear-gradient(145deg, rgba(14, 19, 29, 0.95), rgba(8, 11, 17, 0.98));
+      border: 1px solid var(--border-accent);
+      border-radius: var(--radius-xl);
+      padding: 3.5rem 3rem;
+      box-shadow: var(--shadow-md), var(--shadow-accent);
+      text-align: center;
+      max-width: 860px;
+      margin: 0 auto;
+      position: relative;
+    }
+
+    @media (max-width: 640px) {
+      .contact-card {
+        padding: 2.25rem 1.5rem;
+      }
+    }
+
+    .contact-title {
+      font-size: clamp(1.75rem, 3.5vw, 2.35rem);
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 1rem;
+      letter-spacing: -0.02em;
+    }
+
+    .contact-description {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      line-height: 1.7;
+      max-width: 650px;
+      margin: 0 auto 2.5rem;
+    }
+
+    .contact-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 1rem;
+      align-items: center;
+    }
+
+    .btn-email-main {
+      font-family: var(--font-mono);
+      font-size: 1rem;
+      padding: 0.9rem 2rem;
+      background: var(--pcb-green);
+      color: #03140e;
+      font-weight: 600;
+      border-radius: var(--radius-sm);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.65rem;
+      transition: all var(--transition-normal);
+      border: 1px solid var(--pcb-green);
+      box-shadow: 0 4px 20px rgba(16, 185, 129, 0.3);
+    }
+
+    .btn-email-main:hover {
+      background: var(--pcb-green-light);
+      border-color: var(--pcb-green-light);
+      transform: translateY(-2px);
+      box-shadow: 0 8px 25px rgba(16, 185, 129, 0.45);
+    }
+
+    .btn-copy-email {
+      font-family: var(--font-mono);
+      font-size: 0.9rem;
+      padding: 0.9rem 1.4rem;
+      background: rgba(255, 255, 255, 0.04);
+      color: var(--text-main);
+      border: 1px solid var(--border-medium);
+      border-radius: var(--radius-sm);
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      transition: all var(--transition-fast);
+    }
+
+    .btn-copy-email:hover {
+      background: rgba(255, 255, 255, 0.08);
+      border-color: var(--pcb-green);
+      color: #ffffff;
+    }
+
+    .copy-notification {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: var(--pcb-green);
+      margin-top: 0.75rem;
+      min-height: 1.2rem;
+      opacity: 0;
+      transition: opacity var(--transition-fast);
+    }
+
+    .copy-notification.visible {
+      opacity: 1;
+    }
+
+    .collaboration-topics {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 0.65rem;
+      margin-top: 2rem;
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+    }
+
+    .collab-tag {
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      color: var(--text-dim);
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 0.3rem 0.75rem;
+      border-radius: 9999px;
+    }
+
+    /* ==========================================================================
+       J. FOOTER
+       ========================================================================== */
+    .footer {
+      border-top: 1px solid var(--border-subtle);
+      background: #05070c;
+      padding: 4.5rem 0 2.5rem;
+      color: var(--text-dim);
+    }
+
+    .footer-grid {
+      display: grid;
+      grid-template-columns: 1.4fr 0.8fr 0.8fr;
+      gap: 3rem;
+      margin-bottom: 3rem;
+    }
+
+    @media (max-width: 800px) {
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 2rem;
+      }
+    }
+
+    .footer-brand-title {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: #ffffff;
+      margin-bottom: 0.75rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .footer-brand-desc {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+      line-height: 1.6;
+      max-width: 380px;
+      margin-bottom: 1.25rem;
+    }
+
+    .footer-email-link {
+      font-family: var(--font-mono);
+      font-size: 0.85rem;
+      color: var(--pcb-green);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+    }
+
+    .footer-email-link:hover {
+      text-decoration: underline;
+    }
+
+    .footer-col-title {
+      font-family: var(--font-mono);
+      font-size: 0.78rem;
+      color: #ffffff;
+      text-transform: uppercase;
+      letter-spacing: 0.08em;
+      margin-bottom: 1.1rem;
+    }
+
+    .footer-links {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.65rem;
+    }
+
+    .footer-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      font-size: 0.88rem;
+      transition: color var(--transition-fast);
+    }
+
+    .footer-link:hover {
+      color: var(--pcb-green);
+    }
+
+    .footer-bottom {
+      padding-top: 2rem;
+      border-top: 1px solid var(--border-subtle);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+      font-size: 0.8rem;
+      font-family: var(--font-mono);
+    }
+
+    .footer-infra-note {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: var(--text-dim);
+    }
+
+    .footer-infra-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: var(--pcb-green);
+    }
+
+    /* Reducción de movimiento para accesibilidad */
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: 0.01ms !important;
+        scroll-behavior: auto !important;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Enlace accesible de salto al contenido -->
+  <a href="#contenido-principal" class="skip-link">Saltar al contenido principal</a>
+
+  <!-- ==========================================================================
+       A. NAVBAR
+       ========================================================================== -->
+  <header class="header">
+    <div class="container nav-container">
+      
+      <!-- Identidad AeroForge con icono de hardware -->
+      <a href="#inicio" class="brand-logo" aria-label="AeroForge — Inicio">
+        <div class="brand-mark">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+            <rect x="9" y="9" width="6" height="6"></rect>
+            <line x1="9" y1="1" x2="9" y2="4"></line>
+            <line x1="15" y1="1" x2="15" y2="4"></line>
+            <line x1="9" y1="20" x2="9" y2="23"></line>
+            <line x1="15" y1="20" x2="15" y2="23"></line>
+            <line x1="20" y1="9" x2="23" y2="9"></line>
+            <line x1="20" y1="15" x2="23" y2="15"></line>
+            <line x1="1" y1="9" x2="4" y2="9"></line>
+            <line x1="1" y1="15" x2="4" y2="15"></line>
+          </svg>
+        </div>
+        <div class="brand-text">
+          <span>AeroForge</span>
+          <span class="brand-suffix">R&amp;D</span>
+        </div>
+      </a>
+
+      <!-- Botón de menú móvil -->
+      <button class="nav-toggle" id="nav-toggle" aria-label="Abrir menú de navegación" aria-expanded="false" aria-controls="nav-menu">
+        <svg id="hamburger-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="3" y1="12" x2="21" y2="12"></line>
+          <line x1="3" y1="6" x2="21" y2="6"></line>
+          <line x1="3" y1="18" x2="21" y2="18"></line>
+        </svg>
+        <svg id="close-icon" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="display: none;">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+
+      <!-- Navegación principal -->
+      <nav aria-label="Navegación principal">
+        <ul class="nav-menu" id="nav-menu">
+          <li><a href="#inicio" class="nav-link">Inicio</a></li>
+          <li><a href="#sobre-aeroforge" class="nav-link">AeroForge</a></li>
+          <li><a href="#areas" class="nav-link">Áreas</a></li>
+          <li><a href="#proyectos" class="nav-link">Proyectos</a></li>
+          <li><a href="#tecnologias" class="nav-link">Tecnologías</a></li>
+          <li><a href="#vision" class="nav-link">Visión</a></li>
+          <li><a href="#fundador" class="nav-link">Trayectoria</a></li>
+          <li>
+            <a href="#contacto" class="nav-cta">
+              <span>Contacto</span>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                <line x1="5" y1="12" x2="19" y2="12"></line>
+                <polyline points="12 5 19 12 12 19"></polyline>
+              </svg>
+            </a>
+          </li>
+        </ul>
+      </nav>
+
+    </div>
+  </header>
+
+  <main id="contenido-principal">
+
+    <!-- ==========================================================================
+         B. HERO PRINCIPAL
+         ========================================================================== -->
+    <section class="hero-section" id="inicio">
+      <div class="container">
+        <div class="hero-grid">
+          
+          <!-- Contenido textual del Hero -->
+          <div class="hero-content">
+            
+            <div class="hero-badge-container">
+              <div class="hero-badge">
+                <span class="pulse-dot"></span>
+                <span>INDEPENDENT HARDWARE R&amp;D</span>
+              </div>
+            </div>
+
+            <h1 class="hero-title">
+              AeroForge — <span class="hero-title-accent">Ingeniería Electrónica y Sistemas Autónomos</span>
+            </h1>
+
+            <p class="hero-subtitle">
+              Iniciativa independiente de investigación y desarrollo tecnológico enfocada en hardware, sistemas embebidos, comunicaciones digitales y plataformas autónomas.
+            </p>
+
+            <div class="hero-actions">
+              <a href="#proyectos" class="btn btn-primary">
+                <span>Explorar proyectos</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <line x1="7" y1="17" x2="17" y2="7"></line>
+                  <polyline points="7 7 17 7 17 17"></polyline>
+                </svg>
+              </a>
+              <a href="#sobre-aeroforge" class="btn btn-secondary">
+                <span>Conocer AeroForge</span>
+              </a>
+            </div>
+
+          </div>
+
+          <!-- Panel técnico y esquemático interactivo -->
+          <div class="hero-visual">
+            <div class="hero-schematic-card">
+              
+              <div class="schematic-header">
+                <div class="schematic-tag">
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="currentColor">
+                    <circle cx="12" cy="12" r="10"></circle>
+                  </svg>
+                  <span>ESQUEMA DE INTEGRACIÓN // LAB-01</span>
+                </div>
+                <span>STM32F4 // INAV BUS</span>
+              </div>
+
+              <!-- Ilustración Vectorial Técnica del Sistema Central -->
+              <svg class="schematic-canvas" viewBox="0 0 360 210" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <!-- Retícula PCB -->
+                <defs>
+                  <pattern id="pcb-dots" x="0" y="0" width="16" height="16" patternUnits="userSpaceOnUse">
+                    <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.08)"></circle>
+                  </pattern>
+                </defs>
+                <rect width="360" height="210" fill="url(#pcb-dots)" rx="6"></rect>
+
+                <!-- Pistas de bus SPI / I2C / UART -->
+                <path d="M 60 45 L 140 45 L 140 85" stroke="#10b981" stroke-width="1.5" stroke-dasharray="3 3" opacity="0.6"></path>
+                <path d="M 60 165 L 140 165 L 140 125" stroke="#06b6d4" stroke-width="1.5" opacity="0.6"></path>
+                <path d="M 220 105 L 300 105" stroke="#10b981" stroke-width="2" opacity="0.8"></path>
+                <path d="M 220 85 L 280 85 L 280 45" stroke="#9ca3af" stroke-width="1.2" opacity="0.5"></path>
+                <path d="M 220 125 L 280 125 L 280 165" stroke="#9ca3af" stroke-width="1.2" opacity="0.5"></path>
+
+                <!-- Módulo MCU STM32 Central -->
+                <rect x="130" y="65" width="80" height="80" rx="4" fill="#0d1422" stroke="#10b981" stroke-width="1.5"></rect>
+                <!-- Pines del MCU -->
+                <line x1="145" y1="65" x2="145" y2="60" stroke="#10b981" stroke-width="2"></line>
+                <line x1="160" y1="65" x2="160" y2="60" stroke="#10b981" stroke-width="2"></line>
+                <line x1="175" y1="65" x2="175" y2="60" stroke="#10b981" stroke-width="2"></line>
+                <line x1="195" y1="65" x2="195" y2="60" stroke="#10b981" stroke-width="2"></line>
+
+                <line x1="145" y1="145" x2="145" y2="150" stroke="#10b981" stroke-width="2"></line>
+                <line x1="160" y1="145" x2="160" y2="150" stroke="#10b981" stroke-width="2"></line>
+                <line x1="175" y1="145" x2="175" y2="150" stroke="#10b981" stroke-width="2"></line>
+                <line x1="195" y1="145" x2="195" y2="150" stroke="#10b981" stroke-width="2"></line>
+
+                <text x="170" y="100" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" text-anchor="middle">STM32</text>
+                <text x="170" y="115" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle">CORE // R&amp;D</text>
+
+                <!-- Bloques Periféricos -->
+                <!-- IMU / Sensores -->
+                <rect x="20" y="30" width="55" height="32" rx="3" fill="#111827" stroke="rgba(255,255,255,0.15)"></rect>
+                <text x="47" y="47" fill="#9ca3af" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">SPI // IMU</text>
+                <text x="47" y="56" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="6.5" text-anchor="middle">GYRO/ACC</text>
+
+                <!-- GPS / Baro -->
+                <rect x="20" y="150" width="55" height="32" rx="3" fill="#111827" stroke="rgba(255,255,255,0.15)"></rect>
+                <text x="47" y="167" fill="#9ca3af" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">UART // GPS</text>
+                <text x="47" y="176" fill="#06b6d4" font-family="'JetBrains Mono', monospace" font-size="6.5" text-anchor="middle">NAV COMM</text>
+
+                <!-- Transmisión de Video OpenIPC -->
+                <rect x="280" y="90" width="65" height="32" rx="3" fill="#111827" stroke="rgba(16,185,129,0.4)"></rect>
+                <text x="312" y="106" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">OpenIPC</text>
+                <text x="312" y="115" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="6.5" text-anchor="middle">VIDEO TX/RX</text>
+
+                <!-- Servos / ESC PWM -->
+                <rect x="260" y="30" width="55" height="28" rx="3" fill="#111827" stroke="rgba(255,255,255,0.15)"></rect>
+                <text x="287" y="47" fill="#9ca3af" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">PWM // ESC</text>
+
+                <!-- Enlace RC -->
+                <rect x="260" y="152" width="55" height="28" rx="3" fill="#111827" stroke="rgba(255,255,255,0.15)"></rect>
+                <text x="287" y="169" fill="#9ca3af" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">RF LINK</text>
+              </svg>
+
+              <div class="schematic-status-row">
+                <div class="status-item">
+                  <div class="status-item-label">ARQUITECTURA</div>
+                  <div class="status-item-val highlight">ARM Cortex</div>
+                </div>
+                <div class="status-item">
+                  <div class="status-item-label">FIRMWARE</div>
+                  <div class="status-item-val">INAV / IPC</div>
+                </div>
+                <div class="status-item">
+                  <div class="status-item-label">PROTOTIPADO</div>
+                  <div class="status-item-val highlight">Perfboard</div>
+                </div>
+              </div>
+
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         C. SOBRE AERFORGE
+         ========================================================================== -->
+    <section class="about-initiative-section" id="sobre-aeroforge">
+      <div class="container">
+        
+        <div class="about-initiative-grid">
+          
+          <div>
+            <div class="section-eyebrow">Sobre la Iniciativa</div>
+            <h2 class="section-title">Ingeniería Fundamental Aplicada al Hardware Autónomo</h2>
+            
+            <div class="initiative-text">
+              <p>
+                <strong>AeroForge</strong> nace del interés por diseñar, construir y comprender sistemas electrónicos desde su arquitectura fundamental. Lejos de depender exclusivamente de soluciones comerciales prefabricadas, la iniciativa explora cómo interactúan el hardware, el firmware y las señales de comunicación desde el nivel del circuito físico.
+              </p>
+              <p>
+                Configurada como un <strong>entorno independiente de investigación y desarrollo tecnológico</strong> en etapa temprana dentro del ámbito universitario, AeroForge tiene como meta experimentar, validar prototipos funcionales y sentar bases técnicas sólidas para futuras plataformas autónomas.
+              </p>
+              <p>
+                Cada prototipo desarrollado es una prueba de concepto rigurosa: desde la soldadura de módulos en placas perforadas hasta la puesta a punto de buses SPI, I2C y enlaces de radiofrecuencia para navegación aérea y vídeo digital.
+              </p>
+            </div>
+          </div>
+
+          <!-- Pilares y Principios de AeroForge -->
+          <div class="initiative-box">
+            <ul class="initiative-list">
+              
+              <li class="initiative-list-item">
+                <div class="initiative-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <polygon points="12 2 2 7 12 12 22 7 12 2"></polygon>
+                    <polyline points="2 17 12 22 22 17"></polyline>
+                    <polyline points="2 12 12 17 22 12"></polyline>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="initiative-item-title">Comprensión de Nivel Bajo</h3>
+                  <p class="initiative-item-desc">
+                    Control directo sobre la arquitectura de interconexión, cableado manual y configuración de registros de comunicación entre sensores y procesadores.
+                  </p>
+                </div>
+              </li>
+
+              <li class="initiative-list-item">
+                <div class="initiative-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="8" x2="12" y2="12"></line>
+                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="initiative-item-title">Validación Práctica en Campo</h3>
+                  <p class="initiative-item-desc">
+                    Los circuitos e integraciones son sometidos a pruebas directas de banco y ensayos reales en plataformas aéreas para verificar estabilidad térmica y vibratoria.
+                  </p>
+                </div>
+              </li>
+
+              <li class="initiative-list-item">
+                <div class="initiative-icon">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M2 12h20"></path>
+                    <path d="M20 12l-4-4"></path>
+                    <path d="M20 12l-4 4"></path>
+                  </svg>
+                </div>
+                <div>
+                  <h3 class="initiative-item-title">Trayectoria de Crecimiento</h3>
+                  <p class="initiative-item-desc">
+                    Evolución planificada hacia el diseño de circuitos impresos dedicados (PCB), mayor integración y apertura a colaboraciones académicas e institucionales.
+                  </p>
+                </div>
+              </li>
+
+            </ul>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         D. ÁREAS DE DESARROLLO
+         ========================================================================== -->
+    <section id="areas">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-eyebrow">Capacidades Técnicas</div>
+          <h2 class="section-title">Áreas de Desarrollo</h2>
+          <p class="section-description">
+            Líneas de trabajo técnico estructuradas para abordar los retos del vuelo no tripulado y el hardware electrónico experimental.
+          </p>
+        </div>
+
+        <div class="areas-grid">
+
+          <!-- Área 1 -->
+          <article class="area-card">
+            <div class="area-icon-container">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                <rect x="9" y="9" width="6" height="6"></rect>
+                <line x1="9" y1="1" x2="9" y2="4"></line>
+                <line x1="15" y1="1" x2="15" y2="4"></line>
+                <line x1="9" y1="20" x2="9" y2="23"></line>
+                <line x1="15" y1="20" x2="15" y2="23"></line>
+                <line x1="20" y1="9" x2="23" y2="9"></line>
+                <line x1="20" y1="15" x2="23" y2="15"></line>
+                <line x1="1" y1="9" x2="4" y2="9"></line>
+                <line x1="1" y1="15" x2="4" y2="15"></line>
+              </svg>
+            </div>
+            <h3 class="area-title">Sistemas Embebidos</h3>
+            <p class="area-description">
+              Diseño e integración de soluciones con microcontroladores STM32, sensores inerciales y barométricos, firmware especializado y gestión de buses de comunicación.
+            </p>
+          </article>
+
+          <!-- Área 2 -->
+          <article class="area-card">
+            <div class="area-icon-container">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M12 2L2 7l10 5 10-5-10-5z"></path>
+                <path d="M2 17l10 5 10-5"></path>
+                <path d="M2 12l10 5 10-5"></path>
+              </svg>
+            </div>
+            <h3 class="area-title">Sistemas Autónomos</h3>
+            <p class="area-description">
+              Experimentación con algoritmos de navegación, bucles de estabilización en tiempo real e integración de electrónica de control para plataformas aéreas.
+            </p>
+          </article>
+
+          <!-- Área 3 -->
+          <article class="area-card">
+            <div class="area-icon-container">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"></path>
+                <path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"></path>
+                <circle cx="12" cy="12" r="2"></circle>
+                <path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"></path>
+                <path d="M19.1 4.9C23 8.8 23 15.2 19.1 19.1"></path>
+              </svg>
+            </div>
+            <h3 class="area-title">Comunicaciones Digitales</h3>
+            <p class="area-description">
+              Desarrollo e integración de enlaces de comunicación por radiofrecuencia y sistemas de transmisión y recepción de vídeo digital de baja latencia.
+            </p>
+          </article>
+
+          <!-- Área 4 -->
+          <article class="area-card">
+            <div class="area-icon-container">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"></polygon>
+              </svg>
+            </div>
+            <h3 class="area-title">Prototipado de Hardware</h3>
+            <p class="area-description">
+              Construcción, validación y evolución de prototipos electrónicos funcionales mediante soldadura manual precisa, interconexión modular y ensamblaje estructurado.
+            </p>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         E. PROYECTOS PRINCIPALES
+         ========================================================================== -->
+    <section id="proyectos">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-eyebrow">Validación Experimental</div>
+          <h2 class="section-title">Proyectos Principales</h2>
+          <p class="section-description">
+            Desarrollos y prototipos de ingeniería completados, documentados y evaluados funcionalmente.
+          </p>
+        </div>
+
+        <div class="projects-grid">
+
+          <!-- PROYECTO 1 -->
+          <article class="project-card">
+            <div class="project-media">
+              
+              <div class="project-badge-overlay">PROTOTIPO FUNCIONAL</div>
+
+              <!-- Imagen con soporte de reemplazo automático -->
+              <img 
+                src="ruta-a-tu-foto.jpg" 
+                alt="Controladora de Vuelo STM32 montada en placa perforada" 
+                class="project-image"
+                loading="lazy"
+                onerror="this.style.display='none';"
+              >
+
+              <!-- Placeholder Esquemático Técnico Diferenciado: STM32 -->
+              <div class="project-schematic-preview" aria-hidden="true">
+                <svg viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Pistas y nodos de soldadura -->
+                  <circle cx="40" cy="40" r="3" fill="#10b981"></circle>
+                  <circle cx="60" cy="40" r="3" fill="rgba(255,255,255,0.2)"></circle>
+                  <circle cx="40" cy="60" r="3" fill="rgba(255,255,255,0.2)"></circle>
+                  <line x1="40" y1="40" x2="120" y2="40" stroke="#10b981" stroke-width="1.5"></line>
+                  <line x1="120" y1="40" x2="120" y2="70" stroke="#10b981" stroke-width="1.5"></line>
+                  
+                  <!-- Chip STM32 con pines -->
+                  <rect x="110" y="55" width="100" height="70" rx="3" fill="#0c121d" stroke="#10b981" stroke-width="1.8"></rect>
+                  <text x="160" y="88" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="11" font-weight="700" text-anchor="middle">STM32 MCU</text>
+                  <text x="160" y="103" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle">PERFBOARD ASSY</text>
+
+                  <!-- Buses laterales -->
+                  <path d="M 210 75 L 260 75" stroke="#06b6d4" stroke-width="1.5"></path>
+                  <text x="270" y="78" fill="#06b6d4" font-family="'JetBrains Mono', monospace" font-size="7">SPI // IMU</text>
+
+                  <path d="M 210 95 L 260 95" stroke="#10b981" stroke-width="1.5"></path>
+                  <text x="270" y="98" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="7">I2C // MAG</text>
+
+                  <path d="M 210 115 L 260 115" stroke="#9ca3af" stroke-width="1.5"></path>
+                  <text x="270" y="118" fill="#9ca3af" font-family="'JetBrains Mono', monospace" font-size="7">UART // GPS</text>
+                  
+                  <text x="160" y="152" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle">[ FOTO DE SOLDADURA / PLACA PERFORADA ]</text>
+                </svg>
+              </div>
+
+            </div>
+
+            <div class="project-body">
+              <span class="project-category">Integración de Hardware / Protocolos de Comunicación</span>
+              <h3 class="project-title">Controladora de Vuelo STM32 (Prototipado Manual)</h3>
+              <p class="project-description">
+                Ensamblaje de una controladora de vuelo funcional utilizando placas perforadas. El proyecto implicó la integración manual de un microcontrolador STM32 con giroscopios, módulos GPS y otros sensores mediante buses SPI, I2C y UART. El hardware resultante es capaz de ejecutar INAV para estabilización y navegación autónoma.
+              </p>
+              
+              <div class="project-tech-stack">
+                <span class="project-tech-pill">STM32</span>
+                <span class="project-tech-pill">INAV</span>
+                <span class="project-tech-pill">SPI</span>
+                <span class="project-tech-pill">I2C</span>
+                <span class="project-tech-pill">UART</span>
+                <span class="project-tech-pill">Placa Perforada</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROYECTO 2 -->
+          <article class="project-card">
+            <div class="project-media">
+              
+              <div class="project-badge-overlay">ENLACE RF DIGITAL</div>
+
+              <!-- Imagen con soporte de reemplazo automático -->
+              <img 
+                src="ruta-a-tu-foto.jpg" 
+                alt="Enlace de video digital OpenIPC transmisor y receptor" 
+                class="project-image"
+                loading="lazy"
+                onerror="this.style.display='none';"
+              >
+
+              <!-- Placeholder Esquemático Técnico Diferenciado: OpenIPC RF -->
+              <div class="project-schematic-preview" aria-hidden="true">
+                <svg viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Módulo Cámara Sensor -->
+                  <rect x="35" y="65" width="55" height="50" rx="3" fill="#0c121d" stroke="#9ca3af" stroke-width="1.5"></rect>
+                  <circle cx="62" cy="90" r="12" stroke="#06b6d4" stroke-width="1.5"></circle>
+                  <text x="62" y="93" fill="#06b6d4" font-family="'JetBrains Mono', monospace" font-size="7" text-anchor="middle">CAM</text>
+
+                  <!-- Bus Digital a Procesador IPC -->
+                  <line x1="90" y1="90" x2="135" y2="90" stroke="#06b6d4" stroke-width="2"></line>
+
+                  <!-- Unidad OpenIPC Central -->
+                  <rect x="135" y="60" width="75" height="60" rx="3" fill="#0c121d" stroke="#10b981" stroke-width="1.8"></rect>
+                  <text x="172" y="88" fill="#ffffff" font-family="'JetBrains Mono', monospace" font-size="10" font-weight="700" text-anchor="middle">OpenIPC</text>
+                  <text x="172" y="102" fill="#10b981" font-family="'JetBrains Mono', monospace" font-size="7.5" text-anchor="middle">TX ENCODER</text>
+
+                  <!-- Etapa RF y Antena -->
+                  <line x1="210" y1="90" x2="245" y2="90" stroke="#10b981" stroke-width="2"></line>
+                  <line x1="245" y1="90" x2="245" y2="60" stroke="#10b981" stroke-width="2"></line>
+                  <polyline points="238 60 245 48 252 60" stroke="#10b981" stroke-width="1.8" fill="none"></polyline>
+                  
+                  <!-- Ondas RF -->
+                  <path d="M 258 45 A 12 12 0 0 1 258 65" stroke="#10b981" stroke-width="1.5" stroke-dasharray="2 2"></path>
+                  <path d="M 268 40 A 20 20 0 0 1 268 70" stroke="#06b6d4" stroke-width="1.5" stroke-dasharray="3 3"></path>
+
+                  <text x="160" y="152" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle">[ FOTO DE SISTEMA OPENIPC TX/RX ]</text>
+                </svg>
+              </div>
+
+            </div>
+
+            <div class="project-body">
+              <span class="project-category">Configuración de Sistemas y Radiofrecuencia</span>
+              <h3 class="project-title">Enlace de Video Digital OpenIPC</h3>
+              <p class="project-description">
+                Implementación de un sistema de transmisión y recepción de video digital (TX/RX) ensamblando los componentes desde cero. Utilizando el ecosistema OpenIPC, logré un enlace funcional superando los retos de cableado e integración de módulos independientes para obtener video de baja latencia.
+              </p>
+              
+              <div class="project-tech-stack">
+                <span class="project-tech-pill">OpenIPC</span>
+                <span class="project-tech-pill">Radiofrecuencia</span>
+                <span class="project-tech-pill">Baja Latencia</span>
+                <span class="project-tech-pill">TX / RX</span>
+                <span class="project-tech-pill">Cableado Modular</span>
+              </div>
+            </div>
+          </article>
+
+          <!-- PROYECTO 3 -->
+          <article class="project-card">
+            <div class="project-media">
+              
+              <div class="project-badge-overlay">ENSAYOS EN VUELO</div>
+
+              <!-- Imagen con soporte de reemplazo automático -->
+              <img 
+                src="ruta-a-tu-foto.jpg" 
+                alt="Integración de hardware en avión RC y dron" 
+                class="project-image"
+                loading="lazy"
+                onerror="this.style.display='none';"
+              >
+
+              <!-- Placeholder Esquemático Técnico Diferenciado: Airframe Integration -->
+              <div class="project-schematic-preview" aria-hidden="true">
+                <svg viewBox="0 0 320 180" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <!-- Esquema de ala fija y dron vectorial -->
+                  <!-- Silueta Ala Fija -->
+                  <path d="M 160 35 L 165 65 L 260 90 L 260 100 L 165 88 L 165 130 L 195 145 L 195 152 L 160 146 L 125 152 L 125 145 L 155 130 L 155 88 L 60 100 L 60 90 L 155 65 Z" fill="#0d1422" stroke="#10b981" stroke-width="1.5"></path>
+                  
+                  <!-- Punto de anclaje de aviónica -->
+                  <circle cx="160" cy="85" r="8" fill="#10b981" opacity="0.3"></circle>
+                  <circle cx="160" cy="85" r="3" fill="#10b981"></circle>
+                  <line x1="160" y1="85" x2="220" y2="50" stroke="#06b6d4" stroke-width="1.2"></line>
+                  <rect x="220" y="42" width="70" height="18" rx="2" fill="#0c121d" stroke="#06b6d4" stroke-width="1"></rect>
+                  <text x="255" y="54" fill="#06b6d4" font-family="'JetBrains Mono', monospace" font-size="7" text-anchor="middle">AVIONICS BAY</text>
+
+                  <text x="160" y="166" fill="#64748b" font-family="'JetBrains Mono', monospace" font-size="8" text-anchor="middle">[ FOTO DE INTEGRACIÓN EN CHÁSIS / CAMPO ]</text>
+                </svg>
+              </div>
+
+            </div>
+
+            <div class="project-body">
+              <span class="project-category">Pruebas de Vuelo y Puesta a Punto</span>
+              <h3 class="project-title">Integración en Aviones RC y Drones</h3>
+              <p class="project-description">
+                Instalación y configuración de la electrónica prototipada en diversas plataformas de ala fija y multirotores. Este proyecto abarca desde la adaptación física del hardware en los chasis hasta la calibración en campo para lograr misiones de vuelo autónomo.
+              </p>
+              
+              <div class="project-tech-stack">
+                <span class="project-tech-pill">Ala Fija</span>
+                <span class="project-tech-pill">Multirotores</span>
+                <span class="project-tech-pill">Calibración PID</span>
+                <span class="project-tech-pill">Telemetría</span>
+                <span class="project-tech-pill">Pruebas de Campo</span>
+              </div>
+            </div>
+          </article>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         F. TECNOLOGÍAS (Agrupadas Estructuradamente)
+         ========================================================================== -->
+    <section class="technologies-section" id="tecnologias">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-eyebrow">Stack Tecnológico</div>
+          <h2 class="section-title">Tecnologías y Protocolos</h2>
+          <p class="section-description">
+            Herramientas, plataformas y estándares de comunicación empleados en la implementación de cada subsistema.
+          </p>
+        </div>
+
+        <div class="tech-categories-grid">
+
+          <!-- Categoría 1 -->
+          <div class="tech-category-card">
+            <div class="tech-category-header">
+              <div class="tech-cat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <rect x="4" y="4" width="16" height="16" rx="2"></rect>
+                  <line x1="9" y1="9" x2="15" y2="15"></line>
+                  <line x1="15" y1="9" x2="9" y2="15"></line>
+                </svg>
+              </div>
+              <h3 class="tech-category-title">Microcontroladores y Hardware</h3>
+            </div>
+            
+            <div class="tech-pill-group">
+              <span class="tech-badge">STM32</span>
+              <span class="tech-badge">Placas perforadas</span>
+              <span class="tech-badge">Soldadura manual</span>
+              <span class="tech-badge">Integración de hardware</span>
+            </div>
+          </div>
+
+          <!-- Categoría 2 -->
+          <div class="tech-category-card">
+            <div class="tech-category-header">
+              <div class="tech-cat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <polyline points="16 18 22 12 16 6"></polyline>
+                  <polyline points="8 6 2 12 8 18"></polyline>
+                </svg>
+              </div>
+              <h3 class="tech-category-title">Firmware y Protocolos</h3>
+            </div>
+            
+            <div class="tech-pill-group">
+              <span class="tech-badge">INAV</span>
+              <span class="tech-badge">SPI</span>
+              <span class="tech-badge">I2C</span>
+              <span class="tech-badge">UART</span>
+            </div>
+          </div>
+
+          <!-- Categoría 3 -->
+          <div class="tech-category-card">
+            <div class="tech-category-header">
+              <div class="tech-cat-icon">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M5 12.55a11 11 0 0 1 14.08 0"></path>
+                  <path d="M1.42 9a16 16 0 0 1 21.16 0"></path>
+                  <path d="M8.53 16.11a6 6 0 0 1 6.95 0"></path>
+                  <line x1="12" y1="20" x2="12.01" y2="20"></line>
+                </svg>
+              </div>
+              <h3 class="tech-category-title">Comunicaciones y RF</h3>
+            </div>
+            
+            <div class="tech-pill-group">
+              <span class="tech-badge">OpenIPC</span>
+              <span class="tech-badge">Radiofrecuencia</span>
+              <span class="tech-badge">RX/TX</span>
+              <span class="tech-badge">Vídeo digital</span>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         G. VISIÓN Y DESARROLLO FUTURO
+         ========================================================================== -->
+    <section id="vision">
+      <div class="container">
+        
+        <div class="vision-grid">
+          
+          <div>
+            <div class="section-eyebrow">Hoja de Ruta</div>
+            <h2 class="section-title">Visión y Objetivos de Desarrollo</h2>
+            <p class="section-description" style="margin-bottom: 1.5rem;">
+              AeroForge avanza de manera progresiva y disciplinada. Nuestra meta es consolidar un laboratorio de desarrollo tecnológico capaz de transformar prototipos de banco en sistemas embebidos de alta fiabilidad.
+            </p>
+            <p class="section-description">
+              Estas líneas de desarrollo representan los objetivos técnicos planificados para las siguientes etapas del proyecto.
+            </p>
+          </div>
+
+          <!-- Líneas de Desarrollo Futuro -->
+          <div class="vision-roadmap-list">
+            
+            <div class="vision-item">
+              <div class="vision-step-number">01</div>
+              <div class="vision-content">
+                <h3>Diseño de Circuitos Impresos Dedicados (PCB)</h3>
+                <p>Transicionar desde las placas perforadas hacia el diseño y fabricación de PCBs personalizadas, optimizando la distribución de masa, reducción de ruido electromagnético y compacidad.</p>
+              </div>
+            </div>
+
+            <div class="vision-item">
+              <div class="vision-step-number">02</div>
+              <div class="vision-content">
+                <h3>Sistemas Embebidos Propietarios</h3>
+                <p>Desarrollar soluciones de control y transmisión modulares basadas en microcontroladores y procesadores de arquitectura abierta, con algoritmos ajustados para misiones autónomas específicas.</p>
+              </div>
+            </div>
+
+            <div class="vision-item">
+              <div class="vision-step-number">03</div>
+              <div class="vision-content">
+                <h3>Investigación Aplicada y Colaboración Tecnológica</h3>
+                <p>Establecer vínculos técnicos con semilleros de investigación universitaria, programas de desarrollo de hardware y proyectos de robótica para validar soluciones en escenarios reales.</p>
+              </div>
+            </div>
+
+            <div class="vision-item">
+              <div class="vision-step-number">04</div>
+              <div class="vision-content">
+                <h3>Exploración de Nuevas Plataformas Autónomas</h3>
+                <p>Extender las arquitecturas probadas hacia plataformas autónomas de ala volante para vuelos de largo alcance, inspección técnica y exploración de sensores especializados.</p>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         H. FUNDADOR Y TRAYECTORIA
+         ========================================================================== -->
+    <section class="founder-section" id="fundador">
+      <div class="container">
+        
+        <div class="section-header">
+          <div class="section-eyebrow">Origen y Trayectoria</div>
+          <h2 class="section-title">El Motor Detrás de AeroForge</h2>
+        </div>
+
+        <div class="founder-card">
+          
+          <div class="founder-intro">
+            <span class="founder-badge">INGENIERÍA PRÁCTICA // HARDWARE BUILDER</span>
+            <h3 class="founder-title">Aprendizaje Autodidacta e Integración Real</h3>
+            <p class="founder-focus">De la soldadura en placa perforada a la iniciativa AeroForge</p>
+
+            <div class="founder-timeline">
+              <div class="timeline-milestone">
+                <div class="milestone-year">2020</div>
+                <div class="milestone-text">Inicio autodidacta y experimental en electrónica básica, microcontroladores y análisis de circuitos.</div>
+              </div>
+              <div class="timeline-milestone">
+                <div class="milestone-year">2024</div>
+                <div class="milestone-text">Aplicación al vuelo autónomo: controladoras STM32, radiofrecuencia y fundación conceptual de AeroForge.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="founder-narrative">
+            <p>
+              Llevo explorando la electrónica de forma autodidacta y práctica desde 2020. En 2024 decidí aplicar estos conocimientos al vuelo autónomo, construyendo mis propias controladoras y sistemas de transmisión integrando módulos en placas perforadas.
+            </p>
+            <p>
+              Me apasiona entender cómo interactúan el hardware y el software desde su base, soldando cada conexión y configurando manualmente la comunicación entre sensores y firmwares como INAV u OpenIPC.
+            </p>
+            <p>
+              Esta experiencia práctica en resolver problemas de conexionado, interferencias electromagnéticas y compatibilidad de protocolos es la base directa sobre la que se fundamenta AeroForge: una iniciativa tecnológica que busca llevar ese mismo rigor de desarrollo hacia sistemas cada vez más integrados y ambiciosos.
+            </p>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+    <div class="technical-divider"></div>
+
+    <!-- ==========================================================================
+         I. CONTACTO Y COLABORACIÓN
+         ========================================================================== -->
+    <section id="contacto">
+      <div class="container">
+        
+        <div class="contact-card">
+          <div class="section-eyebrow" style="justify-content: center;">Conexión Técnica</div>
+          <h2 class="contact-title">¿Interesado en Colaborar con AeroForge?</h2>
+          
+          <p class="contact-description">
+            AeroForge está abierta a conversaciones técnicas, intercambio de ideas de investigación, colaboraciones académicas dentro del entorno universitario y participación en iniciativas tecnológicas emergentes.
+          </p>
+
+          <div class="contact-actions">
+            <!-- Botón Mailto Oficial -->
+            <a href="mailto:contact@aeroforge.pro" class="btn-email-main">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                <polyline points="22,6 12,13 2,6"></polyline>
+              </svg>
+              <span>contact@aeroforge.pro</span>
+            </a>
+
+            <!-- Botón para Copiar Correo al Portapapeles -->
+            <button class="btn-copy-email" id="copy-email-btn" title="Copiar dirección al portapapeles" aria-label="Copiar correo contact@aeroforge.pro al portapapeles">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+              <span>Copiar</span>
+            </button>
+          </div>
+
+          <div class="copy-notification" id="copy-notification" aria-live="polite">
+            ✓ Dirección copiada al portapapeles
+          </div>
+
+          <div class="collaboration-topics">
+            <span class="collab-tag">Proyectos de Hardware</span>
+            <span class="collab-tag">Investigación en Vuelo Autónomo</span>
+            <span class="collab-tag">Sistemas Embebidos STM32</span>
+            <span class="collab-tag">Colaboración Universitaria</span>
+          </div>
+
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- ==========================================================================
+       J. FOOTER
+       ========================================================================== -->
+  <footer class="footer">
+    <div class="container">
+      
+      <div class="footer-grid">
+        
+        <!-- Identidad y descripción -->
+        <div>
+          <div class="footer-brand-title">
+            <span style="color: var(--pcb-green); font-family: var(--font-mono);">&lt;&#47;&gt;</span>
+            <span>AeroForge</span>
+          </div>
+          <p class="footer-brand-desc">
+            Iniciativa independiente de investigación y desarrollo tecnológico enfocada en hardware, microcontroladores STM32, radiofrecuencia y sistemas de vuelo autónomo.
+          </p>
+          <a href="mailto:contact@aeroforge.pro" class="footer-email-link">
+            <span>contact@aeroforge.pro</span>
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+              <polyline points="12 5 19 12 12 19"></polyline>
+            </svg>
+          </a>
+        </div>
+
+        <!-- Navegación rápida -->
+        <div>
+          <h4 class="footer-col-title">Navegación</h4>
+          <ul class="footer-links">
+            <li><a href="#inicio" class="footer-link">Inicio</a></li>
+            <li><a href="#sobre-aeroforge" class="footer-link">Sobre AeroForge</a></li>
+            <li><a href="#areas" class="footer-link">Áreas de Desarrollo</a></li>
+            <li><a href="#proyectos" class="footer-link">Proyectos Principales</a></li>
+          </ul>
+        </div>
+
+        <!-- Enlaces técnicos y visión -->
+        <div>
+          <h4 class="footer-col-title">Iniciativa</h4>
+          <ul class="footer-links">
+            <li><a href="#tecnologias" class="footer-link">Tecnologías</a></li>
+            <li><a href="#vision" class="footer-link">Visión y Futuro</a></li>
+            <li><a href="#fundador" class="footer-link">Trayectoria del Fundador</a></li>
+            <li><a href="#contacto" class="footer-link">Contacto y Colaboración</a></li>
+          </ul>
+        </div>
+
+      </div>
+
+      <!-- Barra final de derechos y mención de infraestructura -->
+      <div class="footer-bottom">
+        <div>
+          &copy; <span id="current-year"></span> AeroForge. Todos los derechos reservados.
+        </div>
+        
+        <div class="footer-infra-note">
+          <span class="footer-infra-dot"></span>
+          <span>Iniciativa independiente de I+D. Sitio estático autoalojado en servidor Linux Nginx.</span>
+        </div>
+      </div>
+
+    </div>
+  </footer>
+
+  <!-- ==========================================================================
+       SCRIPTS: Navegación móvil, copia de correo, año dinámico y observador
+       ========================================================================== -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      // 1. Año actual dinámico
+      const yearSpan = document.getElementById('current-year');
+      if (yearSpan) {
+        yearSpan.textContent = new Date().getFullYear();
+      }
+
+      // 2. Menú de navegación móvil
+      const navToggle = document.getElementById('nav-toggle');
+      const navMenu = document.getElementById('nav-menu');
+      const hamburgerIcon = document.getElementById('hamburger-icon');
+      const closeIcon = document.getElementById('close-icon');
+
+      if (navToggle && navMenu) {
+        const toggleMenu = (open) => {
+          const isOpen = open !== undefined ? open : navMenu.classList.contains('open');
+          if (isOpen) {
+            navMenu.classList.remove('open');
+            navToggle.setAttribute('aria-expanded', 'false');
+            hamburgerIcon.style.display = 'block';
+            closeIcon.style.display = 'none';
+          } else {
+            navMenu.classList.add('open');
+            navToggle.setAttribute('aria-expanded', 'true');
+            hamburgerIcon.style.display = 'none';
+            closeIcon.style.display = 'block';
+          }
+        };
+
+        navToggle.addEventListener('click', () => {
+          const isCurrentlyOpen = navMenu.classList.contains('open');
+          toggleMenu(isCurrentlyOpen);
+        });
+
+        // Cerrar al hacer clic en un enlace
+        navMenu.querySelectorAll('.nav-link, .nav-cta').forEach(link => {
+          link.addEventListener('click', () => toggleMenu(true));
+        });
+
+        // Cerrar al presionar tecla Escape
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && navMenu.classList.contains('open')) {
+            toggleMenu(true);
+            navToggle.focus();
+          }
+        });
+      }
+
+      // 3. Copiar correo al portapapeles con confirmación visual
+      const copyBtn = document.getElementById('copy-email-btn');
+      const copyNotify = document.getElementById('copy-notification');
+      const emailAddress = 'contact@aeroforge.pro';
+
+      if (copyBtn && copyNotify) {
+        copyBtn.addEventListener('click', async () => {
+          try {
+            if (navigator.clipboard && navigator.clipboard.writeText) {
+              await navigator.clipboard.writeText(emailAddress);
+            } else {
+              // Fallback para entornos antiguos
+              const tempInput = document.createElement('input');
+              tempInput.value = emailAddress;
+              document.body.appendChild(tempInput);
+              tempInput.select();
+              document.execCommand('copy');
+              document.body.removeChild(tempInput);
+            }
+            
+            copyNotify.classList.add('visible');
+            setTimeout(() => {
+              copyNotify.classList.remove('visible');
+            }, 3000);
+          } catch (err) {
+            console.error('No se pudo copiar el correo:', err);
+          }
+        });
+      }
+
+      // 4. Indicador de enlace activo en navegación vía IntersectionObserver
+      const navLinks = document.querySelectorAll('.nav-menu .nav-link');
+      const sections = document.querySelectorAll('section[id]');
+
+      if ('IntersectionObserver' in window && navLinks.length && sections.length) {
+        const observer = new IntersectionObserver((entries) => {
+          entries.forEach(entry => {
+            if (entry.isIntersecting) {
+              const currentId = entry.target.getAttribute('id');
+              navLinks.forEach(link => {
+                const href = link.getAttribute('href');
+                if (href === `#${currentId}`) {
+                  link.classList.add('active');
+                } else {
+                  link.classList.remove('active');
+                }
+              });
+            }
+          });
+        }, {
+          rootMargin: '-20% 0px -70% 0px'
+        });
+
+        sections.forEach(section => observer.observe(section));
+      }
+    });
+  </script>
+
+</body>
+</html>
